@@ -16,30 +16,28 @@
       height: 100vh;
     }
 
+    /* Contêiner com a animação */
     .urna-container {
       position: relative;
-      display: flex;
-      background: #ccc;
-      border-radius: 12px;
-      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      border-radius: 16px;
+      padding: 8px;
       max-width: 800px;
       width: 95%;
       overflow: hidden;
-      padding: 5px;
     }
 
-    /* ✨ Borda metálica animada */
+    /* Borda metálica neon infinita */
     .urna-container::before {
       content: "";
       position: absolute;
-      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      top: 0; left: 0; right: 0; bottom: 0;
       border-radius: 16px;
       background: linear-gradient(270deg,
         #ff0000, #ff7300, #fffb00, #48ff00,
         #00ffd5, #002bff, #7a00ff, #ff00ab, #ff0000);
       background-size: 400% 400%;
       animation: brilhoMetal 6s linear infinite;
-      z-index: -1;
+      z-index: 0;
       filter: brightness(1.3) blur(2px);
     }
 
@@ -49,24 +47,35 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* 🌟 Reflexo pulsante */
+    /* Reflexo pulsante */
     .urna-container::after {
       content: "";
       position: absolute;
       inset: 0;
-      border-radius: 12px;
+      border-radius: 16px;
       background: radial-gradient(circle at center,
         rgba(255,255,255,0.25) 0%,
         rgba(255,255,255,0.05) 40%,
         transparent 70%);
       animation: reflexoPulse 4s ease-in-out infinite;
-      z-index: 0;
+      z-index: 1;
       pointer-events: none;
     }
 
     @keyframes reflexoPulse {
       0%, 100% { opacity: 0.2; transform: scale(1); }
       50% { opacity: 0.5; transform: scale(1.05); }
+    }
+
+    /* Miolo da urna (fundo cinza real) */
+    .urna-inner {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      background: #ccc;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      overflow: hidden;
     }
 
     .tela {
@@ -77,8 +86,6 @@
       flex-direction: column;
       justify-content: space-between;
       border-right: 3px solid #999;
-      position: relative;
-      z-index: 1;
     }
 
     .tela h2 { margin-top: 0; font-size: 20px; color: #333; }
@@ -92,8 +99,6 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      position: relative;
-      z-index: 1;
     }
 
     button {
@@ -112,7 +117,7 @@
     .resultado { margin-top: 10px; font-size: 16px; color: #222; }
 
     @media (max-width: 600px) {
-      .urna-container { flex-direction: column; }
+      .urna-inner { flex-direction: column; }
       .tela, .teclado { width: 100%; }
     }
   </style>
@@ -120,34 +125,36 @@
 <body>
 
   <div class="urna-container">
-    <div class="tela">
-      <div>
-        <h2>Eleições 2025</h2>
-        <p id="mensagem">Digite seu voto:</p>
-        <p id="voto" class="info-voto">_</p>
-        <img id="foto" src="" alt="Foto do Candidato">
+    <div class="urna-inner">
+      <div class="tela">
+        <div>
+          <h2>Eleições 2025</h2>
+          <p id="mensagem">Digite seu voto:</p>
+          <p id="voto" class="info-voto">_</p>
+          <img id="foto" src="" alt="Foto do Candidato">
+        </div>
+        <div class="resultado">
+          <h4>Resultado:</h4>
+          <p id="resultado">Nenhum voto registrado.</p>
+          <button class="btn-confirma" onclick="apurarVotos()">Encerrar Votação</button>
+        </div>
       </div>
-      <div class="resultado">
-        <h4>Resultado:</h4>
-        <p id="resultado">Nenhum voto registrado.</p>
-        <button class="btn-confirma" onclick="apurarVotos()">Encerrar Votação</button>
-      </div>
-    </div>
 
-    <div class="teclado">
-      <button class="btn-numero" onclick="digitar('1')">1</button>
-      <button class="btn-numero" onclick="digitar('2')">2</button>
-      <button class="btn-numero" onclick="digitar('3')">3</button>
-      <button class="btn-numero" onclick="digitar('4')">4</button>
-      <button class="btn-numero" onclick="digitar('5')">5</button>
-      <button class="btn-numero" onclick="digitar('6')">6</button>
-      <button class="btn-numero" onclick="digitar('7')">7</button>
-      <button class="btn-numero" onclick="digitar('8')">8</button>
-      <button class="btn-numero" onclick="digitar('9')">9</button>
-      <button class="btn-numero" onclick="digitar('0')">0</button>
-      <button class="btn-branco" onclick="votarBranco()">BRANCO</button>
-      <button class="btn-corrige" onclick="corrigir()">CORRIGE</button>
-      <button class="btn-confirma" onclick="confirmar()">CONFIRMA</button>
+      <div class="teclado">
+        <button class="btn-numero" onclick="digitar('1')">1</button>
+        <button class="btn-numero" onclick="digitar('2')">2</button>
+        <button class="btn-numero" onclick="digitar('3')">3</button>
+        <button class="btn-numero" onclick="digitar('4')">4</button>
+        <button class="btn-numero" onclick="digitar('5')">5</button>
+        <button class="btn-numero" onclick="digitar('6')">6</button>
+        <button class="btn-numero" onclick="digitar('7')">7</button>
+        <button class="btn-numero" onclick="digitar('8')">8</button>
+        <button class="btn-numero" onclick="digitar('9')">9</button>
+        <button class="btn-numero" onclick="digitar('0')">0</button>
+        <button class="btn-branco" onclick="votarBranco()">BRANCO</button>
+        <button class="btn-corrige" onclick="corrigir()">CORRIGE</button>
+        <button class="btn-confirma" onclick="confirmar()">CONFIRMA</button>
+      </div>
     </div>
   </div>
 
