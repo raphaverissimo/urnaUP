@@ -15,16 +15,39 @@
       align-items: center;
       height: 100vh;
     }
+
+    /* 🌈 Animação metálica ao ligar */
     .urna-container {
+      position: relative;
       display: flex;
       background: #ccc;
-      border: 8px solid #999;
       border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
       max-width: 800px;
       width: 95%;
       overflow: hidden;
     }
+
+    .urna-container::before {
+      content: "";
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 14px;
+      padding: 4px;
+      background: linear-gradient(270deg, 
+        #ff0000, #ff7300, #fffb00, #48ff00, 
+        #00ffd5, #002bff, #7a00ff, #ff00ab, #ff0000);
+      background-size: 400% 400%;
+      animation: brilhoMetal 4s ease forwards;
+      z-index: -1;
+    }
+
+    @keyframes brilhoMetal {
+      0%   { background-position: 0% 50%; opacity: 0; transform: scale(0.9); }
+      50%  { background-position: 100% 50%; opacity: 1; transform: scale(1.05); }
+      100% { background-position: 0% 50%; opacity: 0; transform: scale(1); }
+    }
+
     .tela {
       background: #e0e0e0;
       padding: 20px;
@@ -37,6 +60,7 @@
     .tela h2 { margin-top: 0; font-size: 20px; color: #333; }
     .info-voto { font-size: 18px; font-weight: bold; margin: 10px 0; color: #000; }
     #foto { width: 120px; height: 140px; border: 2px solid #000; background: white; margin-top: 10px; display: none; }
+
     .teclado {
       background: #333;
       padding: 20px;
@@ -99,12 +123,23 @@
   <!-- Sons -->
   <audio id="somTecla" src="tecla.mp3" preload="auto"></audio>
   <audio id="somConfirma" src="telca02.mp3" preload="auto"></audio>
+  <!-- 🔊 Som inicial da urna -->
+  <audio id="somInicial" src="startup.mp3" preload="auto"></audio>
 
   <script>
     let votoAtual = "";
     let votacaoAtiva = true;
 
-    // 🟢 Funções da urna
+    // ▶️ Reproduz o som ao abrir a urna
+    window.addEventListener("load", () => {
+      const somInicial = document.getElementById("somInicial");
+      if (somInicial) {
+        somInicial.play().catch(() => {
+          console.log("Som inicial bloqueado pelo navegador até interação do usuário.");
+        });
+      }
+    });
+
     function digitar(numero) {
       const som = document.getElementById('somTecla');
       if (som.readyState >= 2) { som.currentTime = 0; som.play(); }
