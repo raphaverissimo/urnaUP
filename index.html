@@ -16,36 +16,57 @@
       height: 100vh;
     }
 
-    /* 🌈 Animação metálica ao ligar */
     .urna-container {
       position: relative;
       display: flex;
       background: #ccc;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 0 25px rgba(0,0,0,0.4);
       max-width: 800px;
       width: 95%;
       overflow: hidden;
+      padding: 5px;
     }
 
+    /* ✨ Borda metálica animada */
     .urna-container::before {
       content: "";
       position: absolute;
-      top: -4px; left: -4px; right: -4px; bottom: -4px;
-      border-radius: 14px;
-      padding: 4px;
-      background: linear-gradient(270deg, 
-        #ff0000, #ff7300, #fffb00, #48ff00, 
+      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      border-radius: 16px;
+      background: linear-gradient(270deg,
+        #ff0000, #ff7300, #fffb00, #48ff00,
         #00ffd5, #002bff, #7a00ff, #ff00ab, #ff0000);
       background-size: 400% 400%;
-      animation: brilhoMetal 4s ease forwards;
+      animation: brilhoMetal 6s linear infinite;
       z-index: -1;
+      filter: brightness(1.3) blur(2px);
     }
 
     @keyframes brilhoMetal {
-      0%   { background-position: 0% 50%; opacity: 0; transform: scale(0.9); }
-      50%  { background-position: 100% 50%; opacity: 1; transform: scale(1.05); }
-      100% { background-position: 0% 50%; opacity: 0; transform: scale(1); }
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* 🌟 Reflexo pulsante */
+    .urna-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(circle at center,
+        rgba(255,255,255,0.25) 0%,
+        rgba(255,255,255,0.05) 40%,
+        transparent 70%);
+      animation: reflexoPulse 4s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes reflexoPulse {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.05); }
     }
 
     .tela {
@@ -56,7 +77,10 @@
       flex-direction: column;
       justify-content: space-between;
       border-right: 3px solid #999;
+      position: relative;
+      z-index: 1;
     }
+
     .tela h2 { margin-top: 0; font-size: 20px; color: #333; }
     .info-voto { font-size: 18px; font-weight: bold; margin: 10px 0; color: #000; }
     #foto { width: 120px; height: 140px; border: 2px solid #000; background: white; margin-top: 10px; display: none; }
@@ -68,7 +92,10 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
+      position: relative;
+      z-index: 1;
     }
+
     button {
       height: 50px;
       font-size: 18px;
@@ -81,7 +108,9 @@
     .btn-branco { background: #fff; color: #000; grid-column: span 3; }
     .btn-corrige { background: #f90; color: #fff; grid-column: span 3; }
     .btn-confirma { background: #0a5; color: #fff; grid-column: span 3; }
+
     .resultado { margin-top: 10px; font-size: 16px; color: #222; }
+
     @media (max-width: 600px) {
       .urna-container { flex-direction: column; }
       .tela, .teclado { width: 100%; }
@@ -89,6 +118,7 @@
   </style>
 </head>
 <body>
+
   <div class="urna-container">
     <div class="tela">
       <div>
@@ -103,6 +133,7 @@
         <button class="btn-confirma" onclick="apurarVotos()">Encerrar Votação</button>
       </div>
     </div>
+
     <div class="teclado">
       <button class="btn-numero" onclick="digitar('1')">1</button>
       <button class="btn-numero" onclick="digitar('2')">2</button>
@@ -123,22 +154,10 @@
   <!-- Sons -->
   <audio id="somTecla" src="tecla.mp3" preload="auto"></audio>
   <audio id="somConfirma" src="telca02.mp3" preload="auto"></audio>
-  <!-- 🔊 Som inicial da urna -->
-  <audio id="somInicial" src="startup.mp3" preload="auto"></audio>
 
   <script>
     let votoAtual = "";
     let votacaoAtiva = true;
-
-    // ▶️ Reproduz o som ao abrir a urna
-    window.addEventListener("load", () => {
-      const somInicial = document.getElementById("somInicial");
-      if (somInicial) {
-        somInicial.play().catch(() => {
-          console.log("Som inicial bloqueado pelo navegador até interação do usuário.");
-        });
-      }
-    });
 
     function digitar(numero) {
       const som = document.getElementById('somTecla');
