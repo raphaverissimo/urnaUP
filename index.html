@@ -91,6 +91,7 @@
     .tela h2 { margin-top: 0; font-size: 20px; color: #333; }
     .info-voto { font-size: 18px; font-weight: bold; margin: 10px 0; color: #000; }
     #foto { width: 120px; height: 140px; border: 2px solid #000; background: white; margin-top: 10px; display: none; }
+    #nomeCandidato { font-size: 18px; font-weight: bold; color: #111; margin-top: 5px; }
 
     .teclado {
       background: #333;
@@ -132,6 +133,7 @@
           <p id="mensagem">Digite seu voto:</p>
           <p id="voto" class="info-voto">_</p>
           <img id="foto" src="" alt="Foto do Candidato">
+          <p id="nomeCandidato"></p>
         </div>
         <div class="resultado">
           <h4>Resultado:</h4>
@@ -166,19 +168,41 @@
     let votoAtual = "";
     let votacaoAtiva = true;
 
+    const candidatos = {
+      "13": { nome: "Lula", foto: "imagens/lula.jpg" },
+      "22": { nome: "Bolsonaro", foto: "imagens/bolsonaro.jpg" }
+    };
+
+    function atualizarTela() {
+      const votoEl = document.getElementById('voto');
+      const fotoEl = document.getElementById('foto');
+      const nomeEl = document.getElementById('nomeCandidato');
+
+      votoEl.innerText = votoAtual || "_";
+
+      if (candidatos[votoAtual]) {
+        fotoEl.src = candidatos[votoAtual].foto;
+        fotoEl.style.display = "block";
+        nomeEl.innerText = candidatos[votoAtual].nome;
+      } else {
+        fotoEl.style.display = "none";
+        nomeEl.innerText = "";
+      }
+    }
+
     function digitar(numero) {
+      if (!votacaoAtiva) return;
       const som = document.getElementById('somTecla');
       if (som.readyState >= 2) { som.currentTime = 0; som.play(); }
       if (votoAtual.length < 2) {
         votoAtual += numero;
-        document.getElementById('voto').innerText = votoAtual;
+        atualizarTela();
       }
     }
 
     function corrigir() {
       votoAtual = "";
-      document.getElementById('voto').innerText = "_";
-      document.getElementById('foto').style.display = "none";
+      atualizarTela();
     }
 
     function votarBranco() {
@@ -192,10 +216,13 @@
       const somConfirmar = document.getElementById('somConfirma');
       if (somConfirmar.readyState >= 2) { somConfirmar.currentTime = 0; somConfirmar.play(); }
 
-      let candidato = null;
-      if (votoAtual === "13") candidato = "Lula";
-      else if (votoAtual === "22") candidato = "Bolsonaro";
-      else { alert("Voto nulo!"); corrigir(); return; }
+      let candidato = candidatos[votoAtual]?.nome;
+
+      if (!candidato) {
+        alert("Voto nulo!");
+        corrigir();
+        return;
+      }
 
       await enviarVoto(candidato);
       corrigir();
