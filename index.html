@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Urna Eletrônica 2025</title>
+  <title>Urna Eletrônica 2025</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -62,24 +62,9 @@
       .urna-container { flex-direction: column; }
       .tela, .teclado { width: 100%; }
     }
-    #login-container {
-      position: absolute; top: 20px; left: 20px;
-      background: #fff; padding: 10px; border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
-    #login-container input { margin: 3px; padding: 5px; }
   </style>
 </head>
 <body>
-  <!-- 🔐 Login -->
-  <div id="login-container">
-    <h3>Login</h3>
-    <input type="text" id="username" placeholder="Usuário" />
-    <input type="password" id="password" placeholder="Senha" />
-    <button onclick="login()">Entrar</button>
-    <p id="login-status" style="color:red;"></p>
-  </div>
-
   <div class="urna-container">
     <div class="tela">
       <div>
@@ -119,32 +104,6 @@
     let votoAtual = "";
     let votacaoAtiva = true;
 
-    // 🔐 Login
-    async function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const response = await fetch("http://localhost:3000/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          localStorage.setItem("token", data.token);
-          document.getElementById("login-status").style.color = "green";
-          document.getElementById("login-status").innerText = "Login realizado!";
-        } else {
-          document.getElementById("login-status").style.color = "red";
-          document.getElementById("login-status").innerText = data.erro || "Erro no login";
-        }
-      } catch (err) {
-        document.getElementById("login-status").innerText = "Falha de conexão.";
-      }
-    }
-
     // 🟢 Funções da urna
     function digitar(numero) {
       const som = document.getElementById('somTecla');
@@ -163,22 +122,12 @@
 
     function votarBranco() {
       if (!votacaoAtiva) return;
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("⚠️ Você precisa fazer login antes de votar em BRANCO!");
-        return;
-      }
       enviarVoto("Branco");
       corrigir();
     }
 
     async function confirmar() {
       if (!votacaoAtiva) return;
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("⚠️ Você precisa fazer login antes de confirmar o voto!");
-        return;
-      }
       const somConfirmar = document.getElementById('somConfirma');
       if (somConfirmar.readyState >= 2) { somConfirmar.currentTime = 0; somConfirmar.play(); }
 
@@ -193,15 +142,9 @@
 
     async function enviarVoto(candidato) {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) { alert("Faça login antes de votar!"); return; }
-
         const response = await fetch("http://localhost:3000/votar", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": token
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ candidato })
         });
 
